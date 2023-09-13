@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { abi } from '../../../Hardhat/artifacts/contracts/Input.sol/HelloWorld.json';
+import { abi } from './Input.json';
 import { ethers } from 'ethers';
-import { bytecode } from '../../../Hardhat/artifacts/contracts/Input.sol/HelloWorld.json';
-import { Wallet, Network, Alchemy, ContractFactory } from 'alchemy-sdk';
-
+import { bytecode } from './Input.json';
 
 const Gesture = () => {
 
@@ -45,25 +43,15 @@ const Gesture = () => {
     }
 
     const DeployContract = async () => {
- 
-        const settings = {
-            apiKey: "o6o_hG8wbBKWhm3TygqAOBbroOJBn-tj",
-            network: Network.MATIC_MUMBAI,
-        };
-
-        console.log("Account is : "+Account);
-        const alchemy = new Alchemy(settings);
-
-        let wallet = new Wallet("5ad7f7823ac4a9518b1ce47b007c63c150bc31382d6878d48cce4abb2cc707ef", alchemy);
-
         
-        console.log(wallet);
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        console.log(provider, signer);
 
-        let factory = new ContractFactory(abi, bytecode, wallet);
-        console.log(factory)
-
-        let contract = await factory.deploy({ gasLimit: 500000});
-        console.log("contract Deployed : " + contract.address);
+        const factory = new ethers.ContractFactory(abi, bytecode, signer);
+        console.log(factory);
+        const contract = await factory.deploy({gasLimit:500000});
+        console.log("Here Is Deployed Contract Address" + await contract.getAddress());
 
     }
 
